@@ -2,34 +2,205 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Chat de Biología con IA para E.S.O.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 BioChat ESO - Tutor de Biología con IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animación de los puntos de carga */
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        /* Scroll suave */
+        #chat-box {
+            scroll-behavior: smooth;
+        }
+
+        /* Efecto hover en mensajes */
+        .message:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        /* Animación de entrada de mensajes */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 flex flex-col items-center p-10">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">💬 Chat Simple con IA</h1>
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen flex flex-col items-center p-4 md:p-10">
     
-    <div id="chat-box" class="w-full max-w-md bg-white p-4 rounded-lg shadow-md h-80 overflow-y-auto mb-4 border border-gray-200">
-        <p class="text-gray-500 italic text-sm">Escribe tu pregunta y presiona Enviar...</p>
+    <!-- Header -->
+    <div class="w-full max-w-3xl mb-6 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+            🧬 BioChat ESO
+        </h1>
+        <p class="text-gray-600 text-sm md:text-base">
+            Tu asistente de biología con Inteligencia Artificial
+        </p>
+        <p class="text-xs text-gray-500 mt-2">
+            Modelo: <span class="font-mono bg-gray-200 px-2 py-1 rounded">phi3:mini</span>
+        </p>
     </div>
 
-    <div class="flex gap-2 w-full max-w-md">
-        <input type="text" id="userInput" class="flex-1 p-2 border rounded" placeholder="Escribe tu pregunta aquí...">
-        <button onclick="enviarPregunta()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Enviar</button>
+    <!-- Chat Container -->
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="height: 600px;">
+        
+        <!-- Chat Messages Area -->
+        <div id="chat-box" class="flex-1 p-4 md:p-6 overflow-y-auto space-y-4 bg-gray-50">
+            <!-- Mensaje de bienvenida -->
+            <div class="message p-4 bg-green-100 border-l-4 border-green-500 rounded-r-lg">
+                <p class="text-green-900">
+                    <strong>🤖 BioChat:</strong> ¡Hola! Soy tu asistente de biología. 
+                    Puedes preguntarme sobre células, ecosistemas, genética, anatomía y mucho más. 
+                    ¿En qué te puedo ayudar hoy?
+                </p>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 bg-white border-t border-gray-200">
+            <div class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    class="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition-colors"
+                    placeholder="Escribe tu pregunta sobre biología..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button 
+                    onclick="enviarPregunta()" 
+                    id="sendButton"
+                    class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    Enviar
+                </button>
+            </div>
+            
+            <!-- Botones de ejemplo -->
+            <div class="mt-3 flex flex-wrap gap-2">
+                <button onclick="usarEjemplo('¿Qué es la fotosíntesis?')" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors">
+                    📸 Fotosíntesis
+                </button>
+                <button onclick="usarEjemplo('¿Cómo funciona el ADN?')" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors">
+                    🧬 ADN
+                </button>
+                <button onclick="usarEjemplo('Explica qué es una célula')" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors">
+                    🔬 Célula
+                </button>
+                <button onclick="limpiarChat()" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-full transition-colors">
+                    🗑️ Limpiar chat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-6 text-center text-xs text-gray-500">
+        <p>💡 Proyecto educativo de código abierto | Desarrollado con ❤️ para estudiantes de ESO</p>
     </div>
 
     <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Manejar Enter para enviar
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                enviarPregunta();
+            }
+        }
+
+        // Usar pregunta de ejemplo
+        function usarEjemplo(pregunta) {
+            userInput.value = pregunta;
+            userInput.focus();
+        }
+
+        // Limpiar el chat
+        function limpiarChat() {
+            if (confirm('¿Seguro que quieres borrar todo el chat?')) {
+                chatBox.innerHTML = `
+                    <div class="message p-4 bg-green-100 border-l-4 border-green-500 rounded-r-lg">
+                        <p class="text-green-900">
+                            <strong>🤖 BioChat:</strong> Chat limpiado. ¿En qué puedo ayudarte?
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // Agregar mensaje al chat
+        function agregarMensaje(tipo, texto) {
+            const mensajeDiv = document.createElement('div');
+            mensajeDiv.className = 'message p-4 rounded-lg';
+            
+            if (tipo === 'usuario') {
+                mensajeDiv.classList.add('bg-blue-100', 'border-l-4', 'border-blue-500', 'rounded-r-lg');
+                mensajeDiv.innerHTML = `<p class="text-blue-900"><strong>👤 Tú:</strong> ${escapeHtml(texto)}</p>`;
+            } else if (tipo === 'ia') {
+                mensajeDiv.classList.add('bg-white', 'border-l-4', 'border-green-500', 'rounded-r-lg', 'shadow-sm');
+                mensajeDiv.innerHTML = `<p class="text-gray-800"><strong>🤖 BioChat:</strong> ${escapeHtml(texto)}</p>`;
+            } else if (tipo === 'error') {
+                mensajeDiv.classList.add('bg-red-100', 'border-l-4', 'border-red-500', 'rounded-r-lg');
+                mensajeDiv.innerHTML = `<p class="text-red-900"><strong>⚠️ Error:</strong> ${escapeHtml(texto)}</p>`;
+            } else if (tipo === 'cargando') {
+                mensajeDiv.classList.add('bg-gray-100', 'border-l-4', 'border-gray-400', 'rounded-r-lg');
+                mensajeDiv.id = 'loading-message';
+                mensajeDiv.innerHTML = `<p class="text-gray-700"><strong>🤖 BioChat:</strong> <span class="loading-dots">Pensando</span></p>`;
+            }
+            
+            chatBox.appendChild(mensajeDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Escapar HTML para prevenir XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Función principal para enviar pregunta
         async function enviarPregunta() {
-            const input = document.getElementById('userInput');
-            const chatBox = document.getElementById('chat-box');
-            const userText = input.value;
+            const userText = userInput.value.trim();
             
-            if (!userText.trim()) return; // No enviar preguntas vacías
+            if (!userText) {
+                userInput.focus();
+                return;
+            }
             
-            // Mostrar la pregunta en pantalla
-            chatBox.innerHTML += `<p class="text-blue-700"><strong>Tú:</strong> ${userText}</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight; // Desplazar al final del chat
+            // Deshabilitar input mientras procesa
+            sendButton.disabled = true;
+            userInput.disabled = true;
             
-            // Llamar a nuestro archivo PHP
+            // Mostrar pregunta del usuario
+            agregarMensaje('usuario', userText);
+            
+            // Limpiar input
+            userInput.value = '';
+            
+            // Mostrar indicador de carga
+            agregarMensaje('cargando');
+            
             try {
                 const response = await fetch('chat.php', {
                     method: 'POST',
@@ -39,20 +210,49 @@
                     body: JSON.stringify({ prompt: userText })
                 });
                 
+                // Eliminar mensaje de carga
+                const loadingMsg = document.getElementById('loading-message');
+                if (loadingMsg) loadingMsg.remove();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
-                // Mostrar la respuesta de la IA
-                chatBox.innerHTML += `<p class="mt-2 text-gray-900"><strong>IA:</strong> ${data.response}</p>`;
-                chatBox.scrollTop = chatBox.scrollHeight; // Desplazar al final del chat
+                if (data.response) {
+                    // Mostrar respuesta de la IA
+                    agregarMensaje('ia', data.response);
+                } else {
+                    throw new Error('Respuesta vacía del servidor');
+                }
                 
             } catch (error) {
-                console.error('Error al comunicarse con el servidor:', error);
-                chatBox.innerHTML += `<p class="mt-2 text-red-600"><strong>Error:</strong> No se pudo obtener respuesta de la IA.</p>`;
-                 chatBox.scrollTop = chatBox.scrollHeight; // Desplazar al final del chat
+                console.error('Error:', error);
+                
+                // Eliminar mensaje de carga si aún existe
+                const loadingMsg = document.getElementById('loading-message');
+                if (loadingMsg) loadingMsg.remove();
+                
+                // Mostrar error
+                agregarMensaje('error', 
+                    'No se pudo conectar con el servidor. Asegúrate de que:\n' +
+                    '1. Ollama esté ejecutándose (ollama serve)\n' +
+                    '2. El servidor PHP esté activo (php -S localhost:8000)\n' +
+                    '3. El modelo phi3:mini esté descargado (ollama pull phi3:mini)'
+                );
+            } finally {
+                // Rehabilitar input
+                sendButton.disabled = false;
+                userInput.disabled = false;
+                userInput.focus();
             }
-            
-            input.value = ''; // Limpiar input
         }
+
+        // Auto-focus en el input al cargar
+        window.onload = () => {
+            userInput.focus();
+        };
     </script>
 </body>
 </html>
