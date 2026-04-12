@@ -26,7 +26,7 @@ $baseConocimiento = [
 
 ## Consejos para añadir contenido
 
-✅ **Copia textualmente** de tu libro de texto (respeta derechos de autor, solo para uso educativo)
+⚠️ **Copia textualmente** de tu libro de texto (respeta derechos de autor, solo para uso educativo)
 ✅ **Incluye datos precisos**: fórmulas, nombres científicos, fechas
 ✅ **Usa términos clave** como nombre del tema (ej: "respiracion_celular", "sistema_nervioso")
 ✅ **150-200 palabras** por tema (ni muy corto ni muy largo)
@@ -39,9 +39,15 @@ $baseConocimiento = [
 ## Fuentes verificadas recomendadas
 
 1. Tu libro de texto de biología
-2. Libros de texto oficiales de editoriales (Santillana, SM, Anaya)
+2. Libros de texto oficiales de editoriales (Santillana, SM, Anaya) ⚠️ ¡Ojo! Derechos de autor y copyright
 3. Apuntes de tu profesor
 4. Enciclopedias científicas para estudiantes
+5. Fuentes de información fiables y ABIERTAS (Sugerencias RAG)
+    - Para solucionar el problema del copyright y construir un RAG 100% legal y abierto, te recomiendo usar estas fuentes (Recursos Educativos Abiertos - REA):
+        - Proyecto Biosfera (INTEF): Es el portal del Ministerio de Educación de España. Tiene unidades didácticas completas de Biología y Geología para toda la ESO. El contenido es fiable, adaptado al currículo español y público.
+        - Procomún (Red de Recursos Educativos Abiertos): También del Ministerio (España). Contiene miles de recursos creados por profesores, bajo licencias Creative Commons.
+        - CK-12 (ck12.org): Tienen libros de texto completos de ciencias y biología (muchos en español) creados específicamente para educación secundaria y bajo licencia abierta. Son perfectos para alimentar tu base de datos.
+        - OpenStax (Biología): Aunque su nivel suele ser de bachillerato/universidad, los conceptos básicos están perfectamente explicados y su uso es 100% libre y gratuito.
 
 ## Ejemplo de workflow con tu padre
 
