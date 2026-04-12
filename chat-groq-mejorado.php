@@ -5,8 +5,17 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// IMPORTANTE: Obtén tu API key gratis en: https://console.groq.com
-$GROQ_API_KEY = "TU_API_KEY_AQUI"; // ⚠️ REEMPLAZA ESTO
+// Cargar configuración (crea un archivo config.php local y NO lo subas a GitHub)
+if (file_exists('config.php')) {
+    include 'config.php';
+}
+// API key obtenida del entorno o config
+$GROQ_API_KEY = defined('GROQ_API_KEY') ? GROQ_API_KEY : getenv('GROQ_API_KEY');
+
+if (!$GROQ_API_KEY) {
+    echo json_encode(["response" => "Error de configuración: API Key no definida."]);
+    exit;
+}
 
 $data = json_decode(file_get_contents('php://input'), true);
 $preguntaUsuario = $data['prompt'] ?? '';
@@ -102,7 +111,9 @@ $palabrasSospechosas = [
     'científicos descubrieron recientemente',
     'en 20[0-9]{2}', // Años específicos sin contexto
     'un estudio de',
-    'la universidad de'
+    'la universidad de',
+    'estudios recientes indican',
+    'expertos afirman'
 ];
 
 $hayAlerta = false;
