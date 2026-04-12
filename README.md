@@ -244,6 +244,26 @@ biochat-eso/
 ├── GUIA_CONTENIDO_VERIFICADO.md # Guía para añadir contenido
 └── README.md                    # Este archivo
 ```
+## 📈 Roadmap y Plan de Mejora (Escalabilidad RAG)
+
+El sistema RAG actual (chat-groq-rag.php) utiliza un array interno en PHP y la función strpos() para buscar coincidencias exactas. Aunque es un enfoque excelente y educativo para empezar, tiene limitaciones al escalar a todo el temario de la ESO (no entiende sinónimos, es sensible a faltas de ortografía y el rendimiento disminuye con textos muy largos).
+
+Para hacer el proyecto más robusto y profesional, proponemos el siguiente plan de evolución:
+
+### Fase 1: Separación de datos (Corto plazo)
+
+- Extraer el conocimiento de la variable $baseConocimiento hacia archivos externos (por ejemplo, múltiples archivos .txt o un conocimiento.json).
+- Evitar mezclar la base de datos con la lógica de PHP.
+
+### Fase 2: Búsqueda inteligente (Medio plazo)
+
+- Mejorar el algoritmo de búsqueda para tolerar errores ortográficos (ej. célula vs celula).
+- Añadir soporte para sinónimos básicos y evitar inyectar información duplicada en el prompt.
+
+### Fase 3: RAG Semántico y Bases de Datos Vectoriales (Largo plazo)
+
+- Generar Embeddings del temario (representaciones matemáticas del texto).
+- Integrar una Base de Datos Vectorial ligera (como ChromaDB o Qdrant) o usar extensiones de SQLite (como sqlite-vss). Esto permitirá buscar por significado conceptual en lugar de hacer coincidencia exacta de palabras, evitando que el RAG falle cuando el alumno formule la pregunta con otras palabras.
 
 ## 🤝 Contribuir
 
