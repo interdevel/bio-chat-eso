@@ -56,7 +56,12 @@
             Tu asistente de biología con Inteligencia Artificial
         </p>
         <p class="text-xs text-gray-500 mt-2">
-            Modelo: <span class="font-mono bg-gray-200 px-2 py-1 rounded">phi3:mini</span>
+            Conexión: 
+            <select id="backendSelect" class="font-mono bg-gray-200 px-2 py-1 rounded text-xs outline-none cursor-pointer">
+                <option value="chat-groq-rag.php">Groq RAG (Llama 3.3 - Verificado)</option>
+                <option value="chat-groq.php">Groq Básico (Llama 3.3)</option>
+                <option value="chat.php">Ollama Local (phi3:mini)</option>
+            </select>
         </p>
     </div>
 
@@ -202,7 +207,8 @@
             agregarMensaje('cargando');
             
             try {
-                const response = await fetch('chat.php', {
+                const endpoint = document.getElementById('backendSelect').value;
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -236,10 +242,10 @@
                 
                 // Mostrar error
                 agregarMensaje('error', 
-                    'No se pudo conectar con el servidor. Asegúrate de que:\n' +
-                    '1. Ollama esté ejecutándose (ollama serve)\n' +
-                    '2. El servidor PHP esté activo (php -S localhost:8000)\n' +
-                    '3. El modelo phi3:mini esté descargado (ollama pull phi3:mini)'
+                    `No se pudo conectar con el backend (${endpoint}). Asegúrate de que:\n` +
+                    '1. El servidor PHP esté activo (php -S localhost:8000)\n' +
+                    '2. Si usas Ollama, esté ejecutándose (ollama serve)\n' +
+                    '3. Si usas Groq, tu API Key sea válida.'
                 );
             } finally {
                 // Rehabilitar input

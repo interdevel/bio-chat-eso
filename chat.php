@@ -34,7 +34,7 @@ Pregunta del estudiante: ";
 $ch = curl_init("http://localhost:11434/api/generate");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 60); // Timeout de 60 segundos
+curl_setopt($ch, CURLOPT_TIMEOUT, 180);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     "model" => "phi3:mini",
     "prompt" => $systemPrompt . $preguntaUsuario,
