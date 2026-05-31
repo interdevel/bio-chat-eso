@@ -152,14 +152,14 @@ $baseConocimiento = [
 
 1. **Lee tu libro de texto** sobre un tema
 2. **Haz un resumen** de 150-200 palabras con datos precisos
-3. **Añádelo** al array `$baseConocimiento` en `chat-groq-rag.php`:
+3. **Añádelo** al archivo `conocimiento.json`:
 
-```php
-$baseConocimiento = [
+```json
+{
     // ... contenido existente ...
     
     "tu_tema" => "Tu resumen verificado del libro de texto aquí..."
-];
+}
 ```
 
 4. **Prueba** haciendo preguntas sobre ese tema

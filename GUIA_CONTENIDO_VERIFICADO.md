@@ -6,22 +6,23 @@ Los modelos de IA pueden "alucinar" (inventar información). Para evitarlo en un
 
 ## Cómo funciona
 
-1. **Tú añades** información de tus libros de texto a `$baseConocimiento`
+1. **Tú añades** información de tus libros de texto al archivo `conocimiento.json`
 2. El sistema **busca** si tu pregunta coincide con algún tema
 3. Si encuentra coincidencia, **inyecta** ese contenido en el prompt
 4. La IA **usa solo** esa información verificada para responder
 
 ## Cómo añadir nuevo contenido
 
-Edita `chat-groq-rag.php` y añade entradas al array `$baseConocimiento`:
+Edita el archivo `conocimiento.json` y añade nuevas entradas al diccionario JSON:
 
-```php
-$baseConocimiento = [
-    "nombre_tema" => "Contenido textual exacto del libro...",
+```json
+{
+    "nombre_tema": "Contenido textual exacto del libro...",
     
     // Ejemplo real:
-    "respiracion_celular" => "La respiración celular es el proceso mediante el cual las células obtienen energía de la glucosa. Ocurre en las mitocondrias. Tiene tres fases: glucólisis (citoplasma), ciclo de Krebs (matriz mitocondrial) y cadena respiratoria (membrana interna). La ecuación general es: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP (energía). Es el proceso opuesto a la fotosíntesis.",
-];
+    "respiracion_celular": "La respiración celular es el proceso mediante el cual las células obtienen energía de la glucosa. Ocurre en las mitocondrias. Tiene tres fases: glucólisis (citoplasma), ciclo de Krebs (matriz mitocondrial) y cadena respiratoria (membrana interna). La ecuación general es: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + ATP (energía). Es el proceso opuesto a la fotosíntesis."
+}
+```
 ```
 
 ## Consejos para añadir contenido
@@ -58,7 +59,7 @@ TÚ (hijo):
 3. Se lo pasas a tu padre
 
 TU PADRE:
-4. Lo añade al array $baseConocimiento con la clave "sistema_digestivo"
+4. Lo añade al archivo `conocimiento.json` con la clave "sistema_digestivo"
 5. Prueba haciendo preguntas sobre el tema
 6. Verifican que las respuestas usen esa información
 ```

@@ -1,0 +1,8 @@
+{
+    "genetica": ["herencia", "gen", "genes", "mendel"],
+    "celula": ["eucariota", "procariota", "nucleo", "mitocondria"],
+    "ecosistema": ["habitat", "bioma", "cadenas troficas", "naturaleza"],
+    "adn": ["acido desoxirribonucleico", "cromosomas"],
+    "fotosintesis": ["clorofila", "plantas", "cloroplastos"],
+    "mitosis": ["division celular", "reproduccion celular"]
+}
