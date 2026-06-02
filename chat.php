@@ -16,6 +16,11 @@ if (empty(trim($preguntaUsuario))) {
     exit;
 }
 
+if (strlen($preguntaUsuario) > 1000) {
+    echo json_encode(["response" => "Tu pregunta es demasiado larga. Por favor, sé más conciso."]);
+    exit;
+}
+
 // System prompt específico para biología de secundaria
 $systemPrompt = "Eres un profesor de biología de educación secundaria obligatoria (ESO) en España. 
 Tu objetivo es ayudar a estudiantes de 12 a 16 años a comprender conceptos de biología.
@@ -56,15 +61,19 @@ curl_close($ch);
 
 // Manejo de errores
 if ($curlError) {
+    // Log del error real
+    error_log("Ollama cURL Error: " . $curlError);
     echo json_encode([
-        "response" => "Error de conexión: " . $curlError . "\n\n¿Has ejecutado 'ollama serve' en otra terminal?"
+        "response" => "Error de conexión con el servidor local de IA. Asegúrate de que Ollama esté funcionando."
     ]);
     exit;
 }
 
 if ($httpCode !== 200) {
+    // Log del error real
+    error_log("Ollama Server Error ($httpCode): " . $response);
     echo json_encode([
-        "response" => "Error del servidor Ollama (código $httpCode). Verifica que Ollama esté ejecutándose con: ollama serve"
+        "response" => "Error del servidor local de IA. Verifica la consola de Ollama para más detalles."
     ]);
     exit;
 }

@@ -1,0 +1,7 @@
+<?php
+// config.php.example
+//
+// Renombra este archivo a "config.php" y añade tu API key.
+// ¡IMPORTANTE! No subas el archivo config.php a tu repositorio de Git.
+
+define('GROQ_API_KEY', 'gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');

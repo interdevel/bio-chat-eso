@@ -1,10 +1,11 @@
 # 🧬 BioChat ESO - Asistente de Biología con IA
 
-Proyecto educativo de código abierto desarrollado para estudiantes de ESO. Chatbot de biología con tres niveles de precisión según necesidades.
+Proyecto educativo de código abierto para estudiantes de ESO. Un chatbot de biología con IA que ofrece diferentes modos de funcionamiento para ajustar la precisión de las respuestas.
 
 ## 📋 Características
 
-- ✅ **3 versiones** con diferentes niveles de precisión
+- ✅ **3 modos de backend** seleccionables: Básico, Mejorado (anti-alucinaciones) y RAG (máxima precisión).
+- ✅ **Interfaz unificada** que permite cambiar de modo fácilmente.
 - ✅ **Anti-alucinación** mediante temperatura baja y validación
 - ✅ **RAG (Retrieval-Augmented Generation)** con contenido de libros de texto
 - ✅ **Interfaz amigable** diseñada para estudiantes de 12-16 años
@@ -27,10 +28,12 @@ Proyecto educativo de código abierto desarrollado para estudiantes de ESO. Chat
 
 ### 3. Configuración
 
-Edita los archivos PHP y reemplaza `TU_API_KEY_AQUI` con tu API key:
+1.  Crea un archivo llamado `config.php` en la raíz del proyecto. Puedes copiarlo desde `config.php.example`.
+2.  Abre `config.php` y pega tu API key de Groq.
 
 ```php
-$GROQ_API_KEY = "gsk_tu_api_key_aqui";
+// En tu archivo config.php (¡NO LO SUBAS A GIT!)
+define('GROQ_API_KEY', 'gsk_tu_api_key_aqui');
 ```
 
 Archivos a editar según la versión que uses:

@@ -1,1 +1,9 @@
+# Local configuration
 config.php
+
+# Composer dependencies
+/vendor/
+composer.lock
+
+# Private files
+_private/

@@ -27,6 +27,11 @@ if (empty(trim($preguntaUsuario))) {
     exit;
 }
 
+if (strlen($preguntaUsuario) > 1000) {
+    echo json_encode(["response" => "Tu pregunta es demasiado larga. Por favor, sé más conciso."]);
+    exit;
+}
+
 $systemPrompt = "Eres un profesor de biología de educación secundaria obligatoria (ESO) en España. 
 Ayudas a estudiantes de 12-16 años a comprender conceptos de biología.
 Usa lenguaje claro, da ejemplos cotidianos y sé motivador.
@@ -55,8 +60,10 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpCode !== 200) {
+    // Log del error real
+    error_log("Groq Basic API Error ($httpCode): " . $response);
     echo json_encode([
-        "response" => "Error en Groq API. Verifica tu API key en chat-groq.php"
+        "response" => "Ocurrió un error al procesar tu pregunta. El administrador ha sido notificado."
     ]);
     exit;
 }

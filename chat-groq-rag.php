@@ -25,6 +25,12 @@ if (empty(trim($preguntaUsuario))) {
     exit;
 }
 
+// Validación de longitud para evitar abusos
+if (strlen($preguntaUsuario) > 1000) {
+    echo json_encode(["response" => "Tu pregunta es demasiado larga. Por favor, sé más conciso."]);
+    exit;
+}
+
 // ========================================
 // BASE DE CONOCIMIENTO VERIFICADA
 // Aquí tu hijo puede añadir contenido de sus libros de texto
@@ -134,7 +140,9 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpCode !== 200) {
-    echo json_encode(["response" => "Error de API. Verifica tu API key."]);
+    // Log del error real
+    error_log("RAG API Error ($httpCode): " . $response);
+    echo json_encode(["response" => "Ocurrió un error al procesar tu pregunta. El administrador ha sido notificado."]);
     exit;
 }
 

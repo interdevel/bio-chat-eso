@@ -27,6 +27,12 @@ if (empty(trim($preguntaUsuario))) {
     exit;
 }
 
+// Validación de longitud para evitar abusos
+if (strlen($preguntaUsuario) > 1000) {
+    echo json_encode(["response" => "Tu pregunta es demasiado larga. Por favor, sé más conciso."]);
+    exit;
+}
+
 // System prompt robusto con contexto curricular ESO y técnicas anti-alucinación
 $systemPrompt = "Eres un profesor de biología de educación secundaria obligatoria (ESO) en España.
 
@@ -85,18 +91,21 @@ curl_close($ch);
 
 // Manejo de errores
 if ($curlError) {
+    // Log del error real para el desarrollador (no mostrar al usuario)
+    error_log("cURL Error: " . $curlError);
     echo json_encode([
-        "response" => "Error de conexión con Groq API. Verifica tu conexión a internet."
+        "response" => "Error de conexión con el servicio de IA. Por favor, inténtalo más tarde."
     ]);
     exit;
 }
 
 if ($httpCode !== 200) {
     $errorData = json_decode($response, true);
-    $errorMsg = $errorData['error']['message'] ?? 'Error desconocido';
-    
+    $errorMsg = $errorData['error']['message'] ?? 'Respuesta de API no válida';
+    // Log del error real
+    error_log("API Error ($httpCode): " . $errorMsg);
     echo json_encode([
-        "response" => "Error de API (código $httpCode): $errorMsg. Verifica tu API key en chat-groq.php"
+        "response" => "Ocurrió un error al procesar tu pregunta. El administrador ha sido notificado."
     ]);
     exit;
 }
