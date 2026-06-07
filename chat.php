@@ -1,25 +1,18 @@
 <?php
 // chat.php - Asistente de Biología ESO con phi3:mini
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+
+// Cargar configuración (opcional aquí: solo para ALLOWED_ORIGINS del CORS)
+if (file_exists('config.php')) {
+    include 'config.php';
+}
+require __DIR__ . '/request-helpers.php';
+
+apply_cors();
+require_post();
 
 // Capturamos la pregunta del estudiante
-$data = json_decode(file_get_contents('php://input'), true);
-$preguntaUsuario = $data['prompt'] ?? '';
-
-if (empty(trim($preguntaUsuario))) {
-    echo json_encode([
-        "response" => "Por favor, escribe una pregunta sobre biología."
-    ]);
-    exit;
-}
-
-if (strlen($preguntaUsuario) > 1000) {
-    echo json_encode(["response" => "Tu pregunta es demasiado larga. Por favor, sé más conciso."]);
-    exit;
-}
+$preguntaUsuario = read_prompt();
 
 // System prompt específico para biología de secundaria
 $systemPrompt = "Eres un profesor de biología de educación secundaria obligatoria (ESO) en España. 

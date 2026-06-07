@@ -5,3 +5,11 @@
 // ¡IMPORTANTE! No subas el archivo config.php a tu repositorio de Git.
 
 define('GROQ_API_KEY', 'gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
+// Allowlist de orígenes (CORS). Solo estos dominios podrán llamar a los
+// endpoints desde otra web. Si la dejas vacía, solo funcionan peticiones
+// del mismo origen (la propia index.html del proyecto).
+define('ALLOWED_ORIGINS', [
+    // 'https://tudominio.com',
+    // 'http://localhost:8000',
+]);

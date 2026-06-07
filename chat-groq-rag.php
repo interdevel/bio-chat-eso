@@ -1,14 +1,16 @@
 <?php
 // chat-groq-rag.php - Con contexto de libros de texto (RAG básico)
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
 
 // Cargar configuración (crea un archivo config.php local y NO lo subas a GitHub)
 if (file_exists('config.php')) {
     include 'config.php';
 }
+require __DIR__ . '/request-helpers.php';
+
+apply_cors();
+require_post();
+
 // API key obtenida del entorno o config
 $GROQ_API_KEY = defined('GROQ_API_KEY') ? GROQ_API_KEY : getenv('GROQ_API_KEY');
 
@@ -17,19 +19,7 @@ if (!$GROQ_API_KEY) {
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
-$preguntaUsuario = $data['prompt'] ?? '';
-
-if (empty(trim($preguntaUsuario))) {
-    echo json_encode(["response" => "Por favor, escribe una pregunta sobre biología."]);
-    exit;
-}
-
-// Validación de longitud para evitar abusos
-if (strlen($preguntaUsuario) > 1000) {
-    echo json_encode(["response" => "Tu pregunta es demasiado larga. Por favor, sé más conciso."]);
-    exit;
-}
+$preguntaUsuario = read_prompt();
 
 // ========================================
 // BASE DE CONOCIMIENTO VERIFICADA
