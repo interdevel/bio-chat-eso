@@ -1,0 +1,12 @@
+{
+    "name": "interdevel/bio-chat-eso",
+    "description": "Asistente de biología con IA para estudiantes de ESO (Groq / Ollama).",
+    "type": "project",
+    "license": "MIT",
+    "keywords": ["education", "biology", "chatbot", "groq", "ollama", "eso"],
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
+    }
+}
