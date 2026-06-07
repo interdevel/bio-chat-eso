@@ -307,12 +307,14 @@ Proyecto padre-hijo para asignatura de biología de ESO.
 ## 🙏 Agradecimientos
 
 - [Anthropic](https://www.anthropic.com/) por Claude
+- [Google](https://www.google.com/) por Gemini
 - [Groq](https://groq.com/) por su API gratuita y rápida
 - [Tailwind CSS](https://tailwindcss.com/) por el framework CSS
-- Todos los profesores de biología que inspiran a estudiantes
+- Los profesores de biología que inspiran a estudiantes
+- Estudiantes como Mario, con sus inquietudes y sus preguntas, aunque a veces nos pongan de los nervios 🫶
 
 ---
 
 **¿Preguntas? ¿Sugerencias?** Abre un issue o contribuye al proyecto.
 
-💡 *Desarrollado con ❤️ para estudiantes de ESO*
+*Desarrollado con ❤️ para estudiantes de ESO*
