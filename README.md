@@ -1,26 +1,27 @@
 # 🧬 BioChat ESO - Asistente de Biología con IA
 
-Proyecto educativo de código abierto para estudiantes de ESO. Un chatbot de biología con IA que ofrece diferentes modos de funcionamiento para ajustar la precisión de las respuestas.
+Proyecto educativo de código abierto para estudiantes de ESO. Un chatbot de biología con IA que permite probar distintos backends: Groq con RAG, Groq básico y Ollama local.
 
 ## 📋 Características
 
-- ✅ **3 modos de backend** seleccionables: Básico, Mejorado (anti-alucinaciones) y RAG (máxima precisión).
-- ✅ **Interfaz unificada** que permite cambiar de modo fácilmente.
-- ✅ **Anti-alucinación** mediante temperatura baja y validación
-- ✅ **RAG (Retrieval-Augmented Generation)** con contenido de libros de texto
-- ✅ **Interfaz amigable** diseñada para estudiantes de 12-16 años
-- ✅ **Código abierto** para compartir y mejorar
-- ✅ **Sin costes** (API gratuita de Groq)
+- ✅ **3 backends seleccionables en la interfaz**: Groq RAG, Groq básico y Ollama local.
+- ✅ **Interfaz unificada** que permite cambiar de backend fácilmente.
+- ✅ **RAG (Retrieval-Augmented Generation)** con resúmenes propios de fuentes abiertas.
+- ✅ **Búsqueda RAG simple** con coincidencias por tema, sinónimos y tolerancia básica a faltas.
+- ✅ **Entrada protegida**: método POST, validación del prompt y allowlist CORS opcional.
+- ✅ **Interfaz amigable** diseñada para estudiantes de 12-16 años.
+- ✅ **Código abierto** para compartir y mejorar.
 
 ## 🚀 Inicio Rápido
 
 ### 1. Requisitos
 
-- PHP 7.4+ con cURL habilitado
-- Navegador web moderno
-- Cuenta gratuita en [Groq](https://console.groq.com)
+- PHP 7.4+ con cURL y JSON habilitados.
+- Navegador web moderno.
+- Cuenta gratuita en [Groq](https://console.groq.com) para usar `chat-groq.php` y `chat-groq-rag.php`.
+- Opcional: Ollama con `phi3:mini` para usar `chat.php`.
 
-### 2. Obtener API Key
+### 2. Obtener API Key de Groq
 
 1. Crea una cuenta gratuita en https://console.groq.com
 2. Ve a "API Keys" y crea una nueva
@@ -28,10 +29,11 @@ Proyecto educativo de código abierto para estudiantes de ESO. Un chatbot de bio
 
 ### 3. Configuración
 
-1.  Copia `config.php.example` a `config.php` en la raíz del proyecto.
-2.  Abre `config.php` y pega tu API key de Groq.
+1. Copia `config.php.example` a `config.php` en la raíz del proyecto.
+2. Abre `config.php` y pega tu API key de Groq.
 
 ```php
+<?php
 // En tu archivo config.php (¡NO LO SUBAS A GIT! Está en .gitignore)
 define('GROQ_API_KEY', 'gsk_tu_api_key_aqui');
 
@@ -42,8 +44,7 @@ define('ALLOWED_ORIGINS', [
 ]);
 ```
 
-No hay que editar las claves dentro de los archivos `chat-*.php`: todos leen la
-configuración desde `config.php` (o desde la variable de entorno `GROQ_API_KEY`).
+No hay que editar las claves dentro de los archivos `chat-*.php`: todos leen la configuración desde `config.php` o desde la variable de entorno `GROQ_API_KEY`.
 
 ### 4. Ejecutar
 
@@ -55,130 +56,123 @@ php -S localhost:8000
 http://localhost:8000/index.html
 ```
 
-`index.html` incluye un selector para cambiar entre los tres backends en caliente.
+`index.html` incluye un selector para cambiar entre los tres backends visibles: `chat-groq-rag.php`, `chat-groq.php` y `chat.php`.
 
-## 📚 Versiones Disponibles
+## 📚 Backends Del Selector
 
-### 🚀 Versión Básica (`chat-groq.php`)
+### 🛡️ Groq RAG (`chat-groq-rag.php`) - Seleccionado por defecto
 
-**Cuándo usar:** Pruebas rápidas, preguntas generales
-
-**Características:**
-- Configuración mínima
-- Respuestas rápidas
-- ⚠️ Puede tener imprecisiones ocasionales
-
-**Backend:** `chat-groq.php` — selecciónalo en el desplegable de `index.html`
-
----
-
-### ⭐ Versión Mejorada (`chat-groq-mejorado.php`) - **RECOMENDADA**
-
-**Cuándo usar:** Uso educativo general
+**Cuándo usar:** cuando quieras que las respuestas se apoyen en la base de conocimiento del proyecto.
 
 **Características:**
-- ✅ Temperatura baja (0.3) para mayor precisión
-- ✅ System prompt con contexto curricular ESO
-- ✅ Validación post-procesamiento
-- ✅ Detección de posibles alucinaciones
-- ✅ Instrucciones anti-invención de datos
+- Usa `conocimiento.json` como base de conocimiento.
+- Usa `sinonimos.json` para mejorar coincidencias.
+- Normaliza algunas tildes y tolera errores ortográficos sencillos con Levenshtein.
+- Inyecta como máximo 2 contextos relevantes en el prompt.
+- Usa temperatura baja (`0.1`) para reducir creatividad.
+- Añade una nota cuando ha usado contexto de la base de conocimiento.
 
-**Backend:** `chat-groq-mejorado.php` — selecciónalo en el desplegable de `index.html`
+**Importante:** el backend indica al modelo que use solo la base de conocimiento, pero sigue siendo una respuesta generada por IA. Para uso académico, conviene revisar la respuesta con el libro, el profesor o la fuente original.
 
-**Técnicas implementadas:**
-- Instrucciones explícitas de "no inventar"
-- Contexto del temario ESO por curso
-- Detección de frases sospechosas ("según estudios recientes...")
-- Disclaimers automáticos si detecta posibles alucinaciones
+### 🚀 Groq Básico (`chat-groq.php`)
 
----
-
-### 🛡️ Versión RAG (`chat-groq-rag.php`) - **MÁS SEGURA**
-
-**Cuándo usar:** Máxima precisión requerida, exámenes, evaluaciones
+**Cuándo usar:** pruebas rápidas y preguntas generales.
 
 **Características:**
-- ✅ Base de conocimiento verificada de libros de texto
-- ✅ Temperatura ultra-baja (0.1)
-- ✅ Respuestas basadas SOLO en contenido proporcionado
-- ✅ Indica cuando usa información verificada
-- ✅ Admite cuando no tiene información
+- Configuración mínima.
+- Respuestas rápidas.
+- Usa temperatura `0.7`, por lo que puede ser menos conservador.
+- No usa base de conocimiento.
 
-**Backend:** `chat-groq-rag.php` — selecciónalo en el desplegable de `index.html`
+### 🧠 Ollama Local (`chat.php`)
 
-**Cómo añadir contenido:** Ver `GUIA_CONTENIDO_VERIFICADO.md`
+**Cuándo usar:** si quieres probar el proyecto sin enviar preguntas a una API externa.
 
-## 🎯 Comparativa de Versiones
+**Características:**
+- Requiere Ollama ejecutándose en `http://localhost:11434`.
+- Usa el modelo `phi3:mini`.
+- No requiere API key de Groq.
+- Depende de que el modelo esté descargado y en marcha en tu máquina.
 
-| Característica | Básica | Mejorada | RAG |
-|----------------|--------|----------|-----|
-| **Precisión** | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Facilidad** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Configuración** | Mínima | Mínima | Media |
-| **Temperatura** | 0.7 | 0.3 | 0.1 |
-| **Validación** | ❌ | ✅ | ✅✅ |
-| **Base datos** | ❌ | ❌ | ✅ |
-| **Uso en aula** | ❌ | ✅ | ✅✅ |
+## ⭐ Backend Adicional
 
-## 🔧 Técnicas Anti-Alucinación Implementadas
+El repositorio incluye también `chat-groq-mejorado.php`, una versión Groq con prompt más estricto, temperatura `0.3` y validación posterior de frases sospechosas. No aparece actualmente en el selector de `index.html`; si quieres usarlo desde la interfaz, añade una opción al `<select>` apuntando a `chat-groq-mejorado.php`.
 
-### 1. Temperatura Baja
+## 🎯 Comparativa
+
+| Característica | Groq RAG | Groq Básico | Ollama Local |
+|----------------|----------|-------------|--------------|
+| **Backend** | Groq API | Groq API | Ollama local |
+| **Archivo** | `chat-groq-rag.php` | `chat-groq.php` | `chat.php` |
+| **Modelo configurado** | `llama-3.3-70b-versatile` | `llama-3.3-70b-versatile` | `phi3:mini` |
+| **Temperatura** | 0.1 | 0.7 | 0.7 |
+| **Base de conocimiento** | ✅ | ❌ | ❌ |
+| **API key Groq** | ✅ | ✅ | ❌ |
+| **Uso recomendado** | Estudio con contenido verificado | Pruebas rápidas | Pruebas locales |
+
+## 🔧 Técnicas Implementadas
+
+### 1. Temperatura baja en RAG
+
 ```php
-"temperature" => 0.3  // Mejorada
-"temperature" => 0.1  // RAG
-```
-Reduce la "creatividad" del modelo = menos invenciones
-
-### 2. System Prompt Específico
-```php
-"NUNCA inventes datos, fechas, nombres científicos o cifras"
-"Si no estás 100% seguro, di 'No tengo esa información'"
-```
-
-### 3. Contexto Curricular
-```php
-"1º ESO (12-13 años): Seres vivos, célula, nutrición..."
-"2º ESO (13-14 años): Nutrición humana, aparatos..."
+"temperature" => 0.1
 ```
 
-### 4. Validación Post-Procesamiento
-```php
-$palabrasSospechosas = [
-    'según estudios recientes',
-    'investigaciones demuestran',
-    'en 20[0-9]{2}' // Fechas específicas sin contexto
-];
-```
+Reduce la creatividad del modelo y favorece respuestas más pegadas al contexto proporcionado.
 
-### 5. RAG - Contenido Verificado
-```php
-$baseConocimiento = [
-    "fotosintesis" => "Contenido textual del libro..."
-];
-```
+### 2. Prompt del sistema
 
-## 📖 Añadir Contenido Verificado (solo versión RAG)
+Los backends usan instrucciones de profesor de biología de ESO, lenguaje claro, respuestas concisas y límites sobre invención de datos.
 
-1. **Lee tu libro de texto** sobre un tema
-2. **Haz un resumen** de 150-200 palabras con datos precisos
-3. **Añádelo** al archivo `conocimiento.json`:
+### 3. Base de conocimiento externa
 
 ```json
 {
-    // ... contenido existente ...
-    
-    "tu_tema" => "Tu resumen verificado del libro de texto aquí..."
+    "fotosintesis": "Resumen propio basado en fuentes abiertas sobre la fotosíntesis."
 }
 ```
 
-4. **Prueba** haciendo preguntas sobre ese tema
+`chat-groq-rag.php` carga `conocimiento.json`, busca temas relevantes y añade ese contexto al prompt.
 
-Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`
+### 4. Sinónimos y tolerancia básica
+
+`sinonimos.json` permite relacionar términos como `adn`, `cromosomas` o `acido desoxirribonucleico`. Además, el código usa Levenshtein para tolerar algunas faltas sencillas.
+
+### 5. Validación de entrada
+
+`request-helpers.php` centraliza:
+
+- CORS por allowlist (`ALLOWED_ORIGINS`).
+- Rechazo de métodos distintos de POST.
+- Lectura y validación del campo `prompt`.
+- Límite de longitud de entrada.
+
+## 📖 Añadir Contenido Verificado
+
+El contenido de `conocimiento.json` debe ser original del proyecto: resúmenes propios, redactados con tus palabras, a partir de fuentes abiertas o materiales que tengas derecho a reutilizar.
+
+Ejemplo válido:
+
+```json
+{
+    "respiracion_celular": "La respiración celular es el proceso por el que las células obtienen energía a partir de moléculas como la glucosa. En las células eucariotas ocurre principalmente en las mitocondrias y permite producir ATP, que la célula utiliza para realizar sus funciones."
+}
+```
+
+Pasos recomendados:
+
+1. Consulta una fuente abierta y fiable.
+2. Redacta un resumen propio de 100-200 palabras.
+3. Añade una clave clara en `conocimiento.json`, sin tildes ni espacios.
+4. Añade sinónimos relacionados en `sinonimos.json` si ayuda a encontrar el tema.
+5. Prueba varias preguntas reales de estudiantes.
+
+Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`.
 
 ## 🎓 Temas Sugeridos por Curso
 
 ### 1º ESO
-- Clasificación seres vivos (5 reinos)
+- Clasificación seres vivos
 - Célula y sus partes
 - Funciones vitales
 - Ecosistemas y cadenas tróficas
@@ -196,7 +190,7 @@ Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`
 - Salud y enfermedad
 
 ### 4º ESO
-- Estructura ADN
+- Estructura del ADN
 - Evolución y selección natural
 - Biotecnología
 - Dinámica de ecosistemas
@@ -204,21 +198,22 @@ Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`
 ## ⚠️ Limitaciones y Precauciones
 
 ### Para Estudiantes
-- ✅ Usa BioChat como **complemento** de estudio
-- ✅ **Verifica** información importante con tu libro o profesor
-- ❌ **NO copies** respuestas directamente en trabajos
-- ❌ **NO sustituye** el estudio ni la comprensión
+- ✅ Usa BioChat como **complemento** de estudio.
+- ✅ **Verifica** información importante con tu libro, profesor o fuente original.
+- ❌ **NO copies** respuestas directamente en trabajos.
+- ❌ **NO sustituye** el estudio ni la comprensión.
 
 ### Para Profesores
-- ✅ Versión RAG recomendada para uso en aula
-- ✅ Revisar respuestas antes de usarlas en evaluaciones
-- ✅ Animar a estudiantes a contrastar información
-- ⚠️ La IA puede equivocarse ocasionalmente
+- ✅ RAG es el modo más recomendable para uso en aula.
+- ✅ Revisa respuestas antes de usarlas en evaluaciones.
+- ✅ Anima a estudiantes a contrastar información.
+- ⚠️ La IA puede equivocarse, incluso con contexto.
 
 ### Aspectos Técnicos
-- Groq tiene límites de uso gratuito (generosos pero existen)
-- Requiere conexión a internet
-- Las respuestas dependen de la calidad del contenido RAG añadido
+- Groq tiene límites de uso gratuito.
+- Los backends Groq requieren conexión a internet.
+- Ollama requiere tener el servicio local activo.
+- Las respuestas RAG dependen de la calidad y cobertura de `conocimiento.json`.
 
 ### Seguridad
 - La API key se carga desde `config.php` (en `.gitignore`) o variable de entorno. Nunca la subas al repositorio.
@@ -227,78 +222,71 @@ Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`
 
 ## 🛠️ Solución de Problemas
 
-### Error: "timeout after 60 seconds"
-**Problema:** Ollama tarda mucho en cargar el modelo
-**Solución:** Usar Groq API (archivos chat-groq-*.php)
-
 ### Error: "Error de configuración: API Key no definida"
-**Problema:** API key incorrecta o no configurada
-**Solución:** Revisa que `config.php` existe y contiene tu `GROQ_API_KEY` (o define la variable de entorno `GROQ_API_KEY`)
+**Problema:** API key incorrecta o no configurada.  
+**Solución:** revisa que `config.php` existe y contiene `GROQ_API_KEY`, o define la variable de entorno `GROQ_API_KEY`.
+
+### Error usando Ollama
+**Problema:** Ollama no está ejecutándose o no tiene el modelo.  
+**Solución:** ejecuta `ollama serve` y asegúrate de tener disponible `phi3:mini`.
 
 ### La IA da respuestas imprecisas
-**Solución 1:** Usa versión "Mejorada" en lugar de "Básica"
-**Solución 2:** Usa versión "RAG" y añade contenido verificado
-**Solución 3:** Reformula la pregunta con más contexto
+**Solución 1:** usa `Groq RAG`.  
+**Solución 2:** añade más contenido verificado a `conocimiento.json`.  
+**Solución 3:** añade sinónimos a `sinonimos.json`.  
+**Solución 4:** reformula la pregunta con más contexto.
 
 ### No carga la página
-**Problema:** Servidor PHP no está corriendo
-**Solución:** Ejecuta `php -S localhost:8000` en la carpeta del proyecto
+**Problema:** servidor PHP no está corriendo.  
+**Solución:** ejecuta `php -S localhost:8000` en la carpeta del proyecto.
 
-## 📂 Estructura del Proyecto
+## 📂 Estructura Del Proyecto
 
-```
-biochat-eso/
+```text
+bio-chat-eso/
 ├── index.html                   # Interfaz única con selector de backend
 ├── chat-groq.php                # Backend básico (Groq)
-├── chat-groq-mejorado.php       # Backend mejorado (Groq, anti-alucinación)
+├── chat-groq-mejorado.php       # Backend mejorado (Groq, no incluido en el selector)
 ├── chat-groq-rag.php            # Backend con RAG (Groq)
 ├── chat.php                     # Backend local (Ollama, phi3:mini)
-├── request-helpers.php          # CORS, validación de método y de entrada (compartido)
-├── conocimiento.json            # Base de conocimiento verificada (RAG)
+├── request-helpers.php          # CORS, método POST y validación de entrada
+├── conocimiento.json            # Resúmenes propios de fuentes abiertas para RAG
 ├── sinonimos.json               # Sinónimos para la búsqueda RAG
-├── config.php.example           # Plantilla de configuración (copiar a config.php)
-├── config.php                   # Tu configuración local (NO se versiona)
-├── composer.json                # Metadatos y requisitos (php>=7.4, ext-curl, ext-json)
+├── config.php.example           # Plantilla de configuración
+├── config.php                   # Configuración local (NO se versiona)
+├── composer.json                # Metadatos y requisitos
 ├── GUIA_CONTENIDO_VERIFICADO.md # Guía para añadir contenido
 ├── LICENSE                      # Licencia MIT
 └── README.md                    # Este archivo
 ```
-## 📈 Roadmap y Plan de Mejora (Escalabilidad RAG)
 
-El sistema RAG actual (chat-groq-rag.php) utiliza un array interno en PHP y la función strpos() para buscar coincidencias exactas. Aunque es un enfoque excelente y educativo para empezar, tiene limitaciones al escalar a todo el temario de la ESO (no entiende sinónimos, es sensible a faltas de ortografía y el rendimiento disminuye con textos muy largos).
+## 📈 Roadmap
 
-Para hacer el proyecto más robusto y profesional, proponemos el siguiente plan de evolución:
+El RAG actual es intencionadamente sencillo: carga un JSON, busca coincidencias por tema/sinónimos y añade contexto al prompt. Es fácil de entender y modificar, pero no sustituye a un sistema semántico completo.
 
-### Fase 1: Separación de datos (Corto plazo)
+Ideas de mejora:
 
-- Extraer el conocimiento de la variable $baseConocimiento hacia archivos externos (por ejemplo, múltiples archivos .txt o un conocimiento.json).
-- Evitar mezclar la base de datos con la lógica de PHP.
-
-### Fase 2: Búsqueda inteligente (Medio plazo)
-
-- Mejorar el algoritmo de búsqueda para tolerar errores ortográficos (ej. célula vs celula).
-- Añadir soporte para sinónimos básicos y evitar inyectar información duplicada en el prompt.
-
-### Fase 3: RAG Semántico y Bases de Datos Vectoriales (Largo plazo)
-
-- Generar Embeddings del temario (representaciones matemáticas del texto).
-- Integrar una Base de Datos Vectorial ligera (como ChromaDB o Qdrant) o usar extensiones de SQLite (como sqlite-vss). Esto permitirá buscar por significado conceptual en lugar de hacer coincidencia exacta de palabras, evitando que el RAG falle cuando el alumno formule la pregunta con otras palabras.
+1. Añadir tests automáticos para validación de entrada y búsqueda RAG.
+2. Añadir metadatos por tema: curso, fuente abierta, licencia y fecha de revisión.
+3. Separar la base de conocimiento en varios archivos por curso o unidad.
+4. Mejorar la búsqueda con embeddings y una base vectorial ligera.
+5. Añadir rate limiting si se despliega públicamente.
 
 ## 🤝 Contribuir
 
 Este es un proyecto educativo de código abierto. Ideas para contribuir:
 
-1. Añadir más contenido verificado a la base de conocimiento
-2. Mejorar las técnicas de validación
-3. Añadir nuevas funcionalidades (imágenes, diagramas)
-4. Traducir a otros idiomas
-5. Crear versiones para otras asignaturas
+1. Añadir más resúmenes propios basados en fuentes abiertas.
+2. Mejorar las técnicas de validación.
+3. Añadir nuevas funcionalidades (imágenes, diagramas).
+4. Traducir a otros idiomas.
+5. Crear versiones para otras asignaturas.
 
 ## 📝 Licencia
 
-Distribuido bajo licencia **MIT**. Ver el archivo [`LICENSE`](LICENSE) para el texto completo. Úsalo, modifícalo y compártelo libremente.
+Distribuido bajo licencia **MIT**. Ver el archivo [`LICENSE`](LICENSE) para el texto completo.
 
-**Nota importante:** Respeta los derechos de autor al copiar contenido de libros de texto. Usa solo extractos con fines educativos.
+El código del proyecto es MIT. El contenido de `conocimiento.json` está formado por resúmenes propios redactados a partir de fuentes abiertas; si añades nuevo contenido, usa textos originales o fuentes con licencia compatible.
 
 ## 👨‍💻 Autores
 

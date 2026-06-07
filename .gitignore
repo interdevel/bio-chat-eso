@@ -7,3 +7,7 @@ composer.lock
 
 # Private files
 _private/
+
+# Local AI/tooling state
+.claude/
+.codex/
