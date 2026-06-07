@@ -28,18 +28,22 @@ Proyecto educativo de código abierto para estudiantes de ESO. Un chatbot de bio
 
 ### 3. Configuración
 
-1.  Crea un archivo llamado `config.php` en la raíz del proyecto. Puedes copiarlo desde `config.php.example`.
+1.  Copia `config.php.example` a `config.php` en la raíz del proyecto.
 2.  Abre `config.php` y pega tu API key de Groq.
 
 ```php
-// En tu archivo config.php (¡NO LO SUBAS A GIT!)
+// En tu archivo config.php (¡NO LO SUBAS A GIT! Está en .gitignore)
 define('GROQ_API_KEY', 'gsk_tu_api_key_aqui');
+
+// Allowlist de orígenes (CORS). Vacío = solo mismo origen (la propia index.html).
+// Añade tu dominio aquí solo si vas a llamar a los endpoints desde otra web.
+define('ALLOWED_ORIGINS', [
+    // 'https://tudominio.com',
+]);
 ```
 
-Archivos a editar según la versión que uses:
-- `chat-groq.php` (versión básica)
-- `chat-groq-mejorado.php` (versión mejorada)
-- `chat-groq-rag.php` (versión RAG)
+No hay que editar las claves dentro de los archivos `chat-*.php`: todos leen la
+configuración desde `config.php` (o desde la variable de entorno `GROQ_API_KEY`).
 
 ### 4. Ejecutar
 
@@ -48,8 +52,10 @@ Archivos a editar según la versión que uses:
 php -S localhost:8000
 
 # Abre en el navegador
-http://localhost:8000/index-selector.html
+http://localhost:8000/index.html
 ```
+
+`index.html` incluye un selector para cambiar entre los tres backends en caliente.
 
 ## 📚 Versiones Disponibles
 
@@ -62,7 +68,7 @@ http://localhost:8000/index-selector.html
 - Respuestas rápidas
 - ⚠️ Puede tener imprecisiones ocasionales
 
-**Archivo:** `index-basico.html`
+**Backend:** `chat-groq.php` — selecciónalo en el desplegable de `index.html`
 
 ---
 
@@ -77,7 +83,7 @@ http://localhost:8000/index-selector.html
 - ✅ Detección de posibles alucinaciones
 - ✅ Instrucciones anti-invención de datos
 
-**Archivo:** `index-mejorado.html`
+**Backend:** `chat-groq-mejorado.php` — selecciónalo en el desplegable de `index.html`
 
 **Técnicas implementadas:**
 - Instrucciones explícitas de "no inventar"
@@ -98,7 +104,7 @@ http://localhost:8000/index-selector.html
 - ✅ Indica cuando usa información verificada
 - ✅ Admite cuando no tiene información
 
-**Archivo:** `index-rag.html`
+**Backend:** `chat-groq-rag.php` — selecciónalo en el desplegable de `index.html`
 
 **Cómo añadir contenido:** Ver `GUIA_CONTENIDO_VERIFICADO.md`
 
@@ -214,15 +220,20 @@ Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`
 - Requiere conexión a internet
 - Las respuestas dependen de la calidad del contenido RAG añadido
 
+### Seguridad
+- La API key se carga desde `config.php` (en `.gitignore`) o variable de entorno. Nunca la subas al repositorio.
+- Los endpoints aplican allowlist de orígenes (`ALLOWED_ORIGINS`), exigen método POST y validan la entrada. Ver `request-helpers.php`.
+- ⚠️ Sin límite de peticiones por IP (rate limiting): si expones los endpoints públicamente, configúralo a nivel de servidor/proxy para reducir el riesgo de abuso de tu cuota Groq.
+
 ## 🛠️ Solución de Problemas
 
 ### Error: "timeout after 60 seconds"
 **Problema:** Ollama tarda mucho en cargar el modelo
 **Solución:** Usar Groq API (archivos chat-groq-*.php)
 
-### Error: "Error de API. Verifica tu API key"
+### Error: "Error de configuración: API Key no definida"
 **Problema:** API key incorrecta o no configurada
-**Solución:** Edita el archivo PHP y añade tu API key de Groq
+**Solución:** Revisa que `config.php` existe y contiene tu `GROQ_API_KEY` (o define la variable de entorno `GROQ_API_KEY`)
 
 ### La IA da respuestas imprecisas
 **Solución 1:** Usa versión "Mejorada" en lugar de "Básica"
@@ -237,14 +248,19 @@ Ver guía completa: `GUIA_CONTENIDO_VERIFICADO.md`
 
 ```
 biochat-eso/
-├── index-selector.html          # Selector de versión
-├── index-basico.html            # Chat básico
-├── index-mejorado.html          # Chat mejorado (RECOMENDADO)
-├── index-rag.html               # Chat con RAG
-├── chat-groq.php                # Backend básico
-├── chat-groq-mejorado.php       # Backend mejorado
-├── chat-groq-rag.php            # Backend con RAG
+├── index.html                   # Interfaz única con selector de backend
+├── chat-groq.php                # Backend básico (Groq)
+├── chat-groq-mejorado.php       # Backend mejorado (Groq, anti-alucinación)
+├── chat-groq-rag.php            # Backend con RAG (Groq)
+├── chat.php                     # Backend local (Ollama, phi3:mini)
+├── request-helpers.php          # CORS, validación de método y de entrada (compartido)
+├── conocimiento.json            # Base de conocimiento verificada (RAG)
+├── sinonimos.json               # Sinónimos para la búsqueda RAG
+├── config.php.example           # Plantilla de configuración (copiar a config.php)
+├── config.php                   # Tu configuración local (NO se versiona)
+├── composer.json                # Metadatos y requisitos (php>=7.4, ext-curl, ext-json)
 ├── GUIA_CONTENIDO_VERIFICADO.md # Guía para añadir contenido
+├── LICENSE                      # Licencia MIT
 └── README.md                    # Este archivo
 ```
 ## 📈 Roadmap y Plan de Mejora (Escalabilidad RAG)
@@ -280,7 +296,7 @@ Este es un proyecto educativo de código abierto. Ideas para contribuir:
 
 ## 📝 Licencia
 
-Proyecto educativo de código abierto. Úsalo, modifícalo y compártelo libremente para fines educativos.
+Distribuido bajo licencia **MIT**. Ver el archivo [`LICENSE`](LICENSE) para el texto completo. Úsalo, modifícalo y compártelo libremente.
 
 **Nota importante:** Respeta los derechos de autor al copiar contenido de libros de texto. Usa solo extractos con fines educativos.
 
